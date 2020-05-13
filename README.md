@@ -2,4 +2,10 @@
 - Membuat Animasi menggunakan React Native Animated.
 - Membuat fitur MapView dan juga Marker
 
-### Installation
+###Instalasi
+
+```
+$ cd ../lorem
+$ npm install
+$ npm start
+```
