@@ -2,7 +2,7 @@
 - Membuat Animasi menggunakan React Native Animated.
 - Membuat fitur MapView dan juga Marker
 
-### Instalasi
+### Installasi
 
 ```
 $ cd ../ProjectDirectory
