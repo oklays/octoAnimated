@@ -1,179 +1,126 @@
-import * as WebBrowser from 'expo-web-browser';
-import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { Component } from "react";
+import {
+  View,
+  Text,
+  Image,
+  Animated,
+  Easing,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { globalStyles } from "constants/globalStyles";
 
-import { MonoText } from '../components/StyledText';
+import CustomContainer from "components/CustomContainer";
+import FontAwesome from "react-native-vector-icons/FontAwesome5";
 
-export default function HomeScreen() {
-  return (
-    <View style={styles.container}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.welcomeContainer}>
-          <Image
-            source={
-              __DEV__
-                ? require('../assets/images/robot-dev.png')
-                : require('../assets/images/robot-prod.png')
-            }
-            style={styles.welcomeImage}
-          />
-        </View>
+const IconButtonProps = [
+  {
+    icon: "play",
+    isSelected: false,
+    value: 1,
+  },
+  {
+    icon: "stop",
+    isSelected: false,
+    value: 0,
+  },
+  {
+    icon: "undo",
+    isSelected: false,
+    value: 0,
+  },
+];
 
-        <View style={styles.getStartedContainer}>
-          <DevelopmentModeNotice />
+export default class HomeScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      inputRangeValue: 1,
+      springValue: new Animated.Value(1),
+    };
+    this.spinValue = new Animated.Value(0);
+  }
 
-          <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
+  componentDidMount() {
+    this.spin();
+  }
+  
+  spin() {
+    this.spinValue.setValue(0);
+    Animated.timing(this.spinValue, {
+      toValue: 1,
+      duration: 4000,
+      easing: Easing.linear,
+    }).start(() => this.spin());
+  }
 
-          <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-            <MonoText>screens/HomeScreen.js</MonoText>
-          </View>
+  animation() {
+    let { springValue } = this.state;
+    Animated.spring(springValue, {
+      toValue: 1.5,
+      friction: 3,
+      stretch: 100,
+    }).start();
+  }
 
-          <Text style={styles.getStartedText}>
-            Change any of the text, save the file, and your app will automatically reload.
-          </Text>
-        </View>
-
-        <View style={styles.helpContainer}>
-          <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
-            <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-      <View style={styles.tabBarInfoContainer}>
-        <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-        <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-          <MonoText style={styles.codeHighlightText}>navigation/BottomTabNavigator.js</MonoText>
-        </View>
-      </View>
-    </View>
-  );
-}
-
-HomeScreen.navigationOptions = {
-  header: null,
-};
-
-function DevelopmentModeNotice() {
-  if (__DEV__) {
-    const learnMoreButton = (
-      <Text onPress={handleLearnMorePress} style={styles.helpLinkText}>
-        Learn more
-      </Text>
-    );
+  render() {
+    const spin = this.spinValue.interpolate({
+      inputRange: [0, this.state.inputRangeValue],
+      outputRange: ["0deg", "360deg"],
+    });
 
     return (
-      <Text style={styles.developmentModeText}>
-        Development mode is enabled: your app will be slower but you can use useful development
-        tools. {learnMoreButton}
-      </Text>
-    );
-  } else {
-    return (
-      <Text style={styles.developmentModeText}>
-        You are not in development mode: your app will run at full speed.
-      </Text>
+      <CustomContainer stylesProps={styles.container}>
+        <Text
+          style={{
+            ...globalStyles.textBoldXlarge,
+            alignSelf: "center",
+            marginTop: 30,
+          }}
+        >
+          React Native Animated
+        </Text>
+        <Animated.Image
+          source={require("assets/images/logo.png")}
+          style={{
+            alignSelf: "center",
+            width: 200,
+            height: 200,
+            transform: [{ rotate: spin }],
+          }}
+        />
+
+        {/* Button Container */}
+        <View style={styles.btnContainer}>
+          {IconButtonProps.map((item) => (
+            <TouchableOpacity
+              style={styles.buttonStyle}
+              onPress={() => this.setState({ inputRangeValue: item.value })}
+            >
+              <FontAwesome name={item.icon} size={16} color="#fff" />
+            </TouchableOpacity>
+          ))}
+        </View>
+        {/* End Button Container */}
+        <Text>{JSON.stringify(this.state, null, 2)}</Text>
+      </CustomContainer>
     );
   }
 }
 
-function handleLearnMorePress() {
-  WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/workflow/development-mode/');
-}
-
-function handleHelpPress() {
-  WebBrowser.openBrowserAsync(
-    'https://docs.expo.io/versions/latest/get-started/create-a-new-app/#making-your-first-change'
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
+  btnContainer: {
+    backgroundColor: "#3792cb",
+    padding: 20,
+    borderRadius: 7,
+    marginHorizontal: 30,
+    flexDirection: "row",
+    justifyContent: "center",
   },
-  contentContainer: {
-    paddingTop: 30,
-  },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { width: 0, height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
+  buttonStyle: {
+    marginHorizontal: 20,
   },
 });
