@@ -1,6 +1,8 @@
 # OctoAnimated
-- Membuat Animasi menggunakan React Native Animated.
-- Membuat fitur MapView dan juga Marker
+
+salah satu aplikasi yang terdapat fitur :
+- React Native Animated.
+- MapView dan juga Marker
 
 ### Installasi
 
